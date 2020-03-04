@@ -1,0 +1,248 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Lab1_climate</title><meta name="generator" content="MATLAB 9.5"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2020-03-04"><meta name="DC.source" content="Lab1_climate.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">clear env,get and set current directory</a></li><li><a href="#2">Lab 1: Cross-correlation on gene expression data</a></li><li><a href="#3">Read the data in the data matrix 'xM' with n rows (experiments) and m columns (genes)</a></li><li><a href="#4">my way</a></li><li><a href="#5">Select subset of K genes (K&lt;=m)</a></li><li><a href="#6">my way Select subset of K genes (K&lt;=m)</a></li><li><a href="#7">Compute the correlation matrix and the significance (p-values)</a></li></ul></div><h2 id="1">clear env,get and set current directory</h2><pre class="codeinput">clc
+clear
+currdir = pwd
+fprintf(currdir)
+userpath(currdir) <span class="comment">%set working directory to current dir of .m file</span>
+</pre><pre class="codeoutput">
+currdir =
+
+    '/home/gtsal/Desktop/Big-Data-Analytics-Labs/Lab1'
+
+/home/gtsal/Desktop/Big-Data-Analytics-Labs/Lab1</pre><h2 id="2">Lab 1: Cross-correlation on gene expression data</h2><pre class="codeinput">alpha = 0.05;
+K = 10;
+nonparametric = 1;
+rthresh = 0.2;
+M = 100;
+dattxt = <span class="string">'../data/MDma.xlsx'</span>;
+dattxt2 = <span class="string">'../data/jena_climate_2009_2016.csv'</span>;
+maxwordlength = 15;
+rng(1);
+</pre><h2 id="3">Read the data in the data matrix 'xM' with n rows (experiments) and m columns (genes)</h2><pre class="codeinput">[xM,txtM]=xlsread(dattxt);
+geneC = txtM(2:end,1);
+experC = txtM(1,2:end);
+xM = xM';
+[n,m]=size(xM);
+</pre><h2 id="4">my way</h2><pre class="codeinput">dataM = readtable(dattxt2);
+<span class="comment">%[n2,m2] = size(dataM);</span>
+disp(<span class="string">'Hello world'</span>);
+m2 = 420551
+n2 = 15
+</pre><pre class="codeoutput">Warning: Variable names were modified to make them valid MATLAB identifiers. The
+original names are saved in the VariableDescriptions property. 
+Hello world
+
+m2 =
+
+      420551
+
+
+n2 =
+
+    15
+
+</pre><h2 id="5">Select subset of K genes (K&lt;=m)</h2><pre class="codeinput">iV = randperm(m);
+xM = xM(:,iV(1:K));
+geneC = dataM(iV(1:K));
+</pre><pre class="codeoutput error">Error using Lab1_climate (line 34)
+Subscripting a table using linear indexing (one subscript) or multidimensional indexing (three or more subscripts) is not supported. Use a row subscript and a variable subscript.
+</pre><h2 id="6">my way Select subset of K genes (K&lt;=m)</h2><pre class="codeinput">dataM.DateTime = datenum(dataM.DateTime, <span class="string">'dd-mm-yyyy HH:MM:SS'</span>);
+</pre><h2 id="7">Compute the correlation matrix and the significance (p-values)</h2><pre class="codeinput">[ccM,p1M] = corrcoef(xM);
+p1M(1:K+1:K*K) = 0; <span class="comment">% assign diagonal values to zero</span>
+<span class="keyword">if</span> nonparametric
+    <span class="comment">% Randomized r values for the pair (x1,x2)</span>
+    p2M = zeros(K,K);
+    ccsurT = NaN*ones(M,K,K);
+    ccsurT(1,:,:) = ccM;
+    <span class="keyword">for</span> i=1:M
+        zM = NaN*ones(n,K);
+        <span class="keyword">for</span> j=1:K
+            zM(:,j) = xM(randperm(n),j);
+        <span class="keyword">end</span>
+        ccsurT(i+1,:,:) = corrcoef(zM);
+    <span class="keyword">end</span>
+    <span class="keyword">for</span> ik=1:K-1
+        <span class="keyword">for</span> jk=ik+1:K
+            rxyV = squeeze(ccsurT(:,ik,jk));
+            p2M(ik,jk) = resampledpvalue(rxyV,1);
+            p2M(jk,ik) = p2M(ik,jk);
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+tit1txt = sprintf(<span class="string">'R_{XY}'</span>);
+h1 = plotnetworktitle(abs(ccM),[],geneC,tit1txt,1,0,maxwordlength);
+
+adj1M = p1M &lt; alpha;
+tit2txt = sprintf(<span class="string">'Parametric p(R_{XY}) &lt; %1.2f'</span>,alpha);
+h2 = plotnetworktitle(adj1M,[0 1],geneC,tit2txt,2,0,maxwordlength);
+
+adjfdr1M = adjFDRmatrix(p1M,alpha,2);
+tit3txt = sprintf(<span class="string">'FDR (a=%1.3f), parametric R_{XY}'</span>,alpha);
+h3 = plotnetworktitle(adjfdr1M,[0 1],geneC,tit3txt,3,0,maxwordlength);
+
+adjthrM = abs(ccM) &gt; rthresh;
+tit4txt = sprintf(<span class="string">'Adjacency R_{XY} &gt; %1.2f'</span>,rthresh);
+h4 = plotnetworktitle(adjthrM,[0 1],geneC,tit4txt,4,0,maxwordlength);
+
+<span class="keyword">if</span> nonparametric
+    adj2M = p2M &lt; alpha;
+    tit5txt = sprintf(<span class="string">'Randomization p(R_{XY}) &lt; %1.2f'</span>,alpha);
+    h5 = plotnetworktitle(adj2M,[0 1],geneC,tit5txt,5,0,maxwordlength);
+    adjfdr2M = adjFDRmatrix(p2M,alpha,2);
+    tit6txt = sprintf(<span class="string">'FDR (a=%1.3f), randomization R_{XY}'</span>,alpha);
+    h6 = plotnetworktitle(adjfdr2M,[0 1],geneC,tit6txt,6,0,maxwordlength);
+<span class="keyword">end</span>
+</pre><p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2018b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% clear env,get and set current directory
+clc
+clear
+currdir = pwd
+fprintf(currdir)
+userpath(currdir) %set working directory to current dir of .m file
+%% Lab 1: Cross-correlation on gene expression data 
+alpha = 0.05;
+K = 10;
+nonparametric = 1; 
+rthresh = 0.2;
+M = 100;
+dattxt = '../data/MDma.xlsx';
+dattxt2 = '../data/jena_climate_2009_2016.csv';
+maxwordlength = 15;
+rng(1);
+
+%% Read the data in the data matrix 'xM' with n rows (experiments) and m columns (genes)
+[xM,txtM]=xlsread(dattxt);
+geneC = txtM(2:end,1);
+experC = txtM(1,2:end);
+xM = xM';
+[n,m]=size(xM);
+
+%% my way
+dataM = readtable(dattxt2);
+%[n2,m2] = size(dataM);
+disp('Hello world');
+m2 = 420551
+n2 = 15
+%% Select subset of K genes (K<=m)
+iV = randperm(m);
+xM = xM(:,iV(1:K));
+geneC = dataM(iV(1:K));
+%% my way Select subset of K genes (K<=m)
+dataM.DateTime = datenum(dataM.DateTime, 'dd-mm-yyyy HH:MM:SS');
+%% Compute the correlation matrix and the significance (p-values)
+[ccM,p1M] = corrcoef(xM);
+p1M(1:K+1:K*K) = 0; % assign diagonal values to zero
+if nonparametric
+    % Randomized r values for the pair (x1,x2)
+    p2M = zeros(K,K);
+    ccsurT = NaN*ones(M,K,K);
+    ccsurT(1,:,:) = ccM;
+    for i=1:M
+        zM = NaN*ones(n,K);
+        for j=1:K
+            zM(:,j) = xM(randperm(n),j);
+        end
+        ccsurT(i+1,:,:) = corrcoef(zM);
+    end
+    for ik=1:K-1
+        for jk=ik+1:K
+            rxyV = squeeze(ccsurT(:,ik,jk));
+            p2M(ik,jk) = resampledpvalue(rxyV,1);
+            p2M(jk,ik) = p2M(ik,jk);
+        end
+    end
+end
+tit1txt = sprintf('R_{XY}');
+h1 = plotnetworktitle(abs(ccM),[],geneC,tit1txt,1,0,maxwordlength);
+
+adj1M = p1M < alpha;
+tit2txt = sprintf('Parametric p(R_{XY}) < %1.2f',alpha);
+h2 = plotnetworktitle(adj1M,[0 1],geneC,tit2txt,2,0,maxwordlength);
+
+adjfdr1M = adjFDRmatrix(p1M,alpha,2);
+tit3txt = sprintf('FDR (a=%1.3f), parametric R_{XY}',alpha);
+h3 = plotnetworktitle(adjfdr1M,[0 1],geneC,tit3txt,3,0,maxwordlength);
+
+adjthrM = abs(ccM) > rthresh;
+tit4txt = sprintf('Adjacency R_{XY} > %1.2f',rthresh);
+h4 = plotnetworktitle(adjthrM,[0 1],geneC,tit4txt,4,0,maxwordlength);
+
+if nonparametric
+    adj2M = p2M < alpha;
+    tit5txt = sprintf('Randomization p(R_{XY}) < %1.2f',alpha);
+    h5 = plotnetworktitle(adj2M,[0 1],geneC,tit5txt,5,0,maxwordlength);
+    adjfdr2M = adjFDRmatrix(p2M,alpha,2);
+    tit6txt = sprintf('FDR (a=%1.3f), randomization R_{XY}',alpha);
+    h6 = plotnetworktitle(adjfdr2M,[0 1],geneC,tit6txt,6,0,maxwordlength);
+end
+
+##### SOURCE END #####
+--></body></html>
